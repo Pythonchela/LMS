@@ -19,6 +19,7 @@ Here every CHARACTER is placed by its coordinates, and the drawn bars are used t
     printed vectors single bold letters are marked with \\x01 … \\x02 in the "rich" text
 """
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -50,6 +51,52 @@ def out(data):
 
 # ----------------------------------------------------------------------------- reading characters
 
+# Glyph codes of the TeX math-extension fonts (CMEX10, LMMathExtension10) that come out as control characters.
+EXT_MAP = {"\x00": "(", "\x01": ")", "\x02": "[", "\x03": "]", "\x10": "(", "\x11": ")", "\x12": "(", "\x13": ")",
+           "R": "\u222b", "Z": "\u222b", "\uf8eb": "(", "\uf8f6": ")", "\uf8ee": "[", "\uf8f9": "]"}
+EXT_DROP = set("\uf8ec\uf8ed\uf8ef\uf8f0\uf8f1\uf8f2\uf8f3\uf8f4\uf8f5\uf8f7\uf8f8\uf8fa\uf8fb")   # middle/bottom pieces of a tall bracket
+
+
+
+_IMG_MAP = None
+_IMG_HASH = {}
+
+
+def image_map():
+    """Optional {md5 of an inline image: its text} (env PDF_IMGMAP = json file). Used for PDFs whose numbers/formulas are inline pictures."""
+    global _IMG_MAP
+    if _IMG_MAP is None:
+        _IMG_MAP = {}
+        path = os.environ.get("PDF_IMGMAP")
+        if path and os.path.exists(path):
+            _IMG_MAP = json.load(open(path, encoding="utf8"))
+    return _IMG_MAP
+
+
+def add_inline_images(page, chars):
+    """Put the text of every mapped inline image into the character stream at the position of the image."""
+    m = image_map()
+    if not m:
+        return chars
+    doc = page.parent
+    sizes = [round(c["size"], 1) for c in chars]
+    body = max(set(sizes), key=sizes.count) if sizes else 10.0
+    order = max((c["o"] for c in chars), default=0)
+    for im in page.get_images(full=True):
+        xref = im[0]
+        key = (id(doc), xref)
+        if key not in _IMG_HASH:
+            _IMG_HASH[key] = hashlib.md5(doc.extract_image(xref)["image"]).hexdigest()
+        text = m.get(_IMG_HASH[key])
+        if not text:
+            continue
+        for r in page.get_image_rects(xref):
+            order += 1
+            chars.append({"c": text, "x0": r.x0, "y0": r.y0, "x1": r.x1, "y1": r.y1, "xs": r.x0, "o": order, "size": body,
+                          "bold": False, "dead": False, "math": None, "font": "image"})
+    return chars
+
+
 def collect_chars(page):
     """Every character of the page with its box. Math-italic letters (𝜆 𝑡 𝐴) become plain letters (λ t A)."""
     chars = []
@@ -70,8 +117,101 @@ def collect_chars(page):
                     x_sort = max(x0, last_x + 1e-3)
                     last_x = x_sort
                     order += 1
+                    is_ext = "CMEX" in span["font"] or "MathExt" in span["font"]
+                    dropped = is_ext and c in EXT_DROP
+                    if is_ext:
+                        c = EXT_MAP.get(c, c)
                     chars.append({"c": c, "x0": x0, "y0": y0, "x1": x1, "y1": y1, "xs": x_sort, "o": order,
-                                  "size": span["size"], "bold": bold, "dead": False, "math": None})
+                                  "size": span["size"], "bold": bold, "dead": dropped, "math": None,
+                                  "font": span["font"]})
+    return chars
+
+
+OPEN_DELIMS, CLOSE_DELIMS = "([{", ")]}"
+
+
+def realign_delimiters(chars, rules=()):
+    """Tall brackets from the TeX extension font (CMEX10) sit about one line ABOVE the text they enclose, and the
+    exponent after them sits above that. Left alone they become a separate line "( )3" and the formula loses its
+    brackets and power. Here each pair is stretched over the characters between it, and an exponent right after the
+    closing bracket is lowered to the normal exponent height."""
+    # Large operators (sum, product, integral) of the same CMEX font are also drawn off the text line:
+    # bring them to the height of the text that follows them so their limits become ordinary powers/indices.
+    for op in [c for c in chars if ("CMEX" in c.get("font", "") or "MathExt" in c.get("font", "")) and c["c"] in "∑∏∫⋃⋂"]:
+        omid = (op["y0"] + op["y1"]) / 2
+        near = [c for c in chars if "CMEX" not in c.get("font", "") and "MathExt" not in c.get("font", "") and c["size"] >= 0.85 * op["size"] and c["c"].isalnum()
+                and op["x1"] <= c["x0"] <= op["x1"] + 60 and abs((c["y0"] + c["y1"]) / 2 - omid) <= 11]
+        if near:
+            # only the text row that is NEAREST in height (a sum sign must not be pulled onto the line above or below)
+            dy = lambda c: abs((c["y0"] + c["y1"]) / 2 - omid)
+            first = min(near, key=dy)
+            fmid = (first["y0"] + first["y1"]) / 2
+            near = [c for c in near if abs((c["y0"] + c["y1"]) / 2 - fmid) <= 3]
+            mids = sorted((c["y0"] + c["y1"]) / 2 for c in near)
+            shift = mids[len(mids) // 2] - omid
+            if abs(shift) > 2:
+                op["y0"] += shift
+                op["y1"] += shift
+            base_mid = mids[len(mids) // 2]
+            # display-style limits sit centred ABOVE and BELOW the sign: move them to its right as upper / lower limit
+            small = [c for c in chars if c is not op and not c["dead"] and c["size"] < 0.9 * op["size"]
+                     and op["x0"] - 6 <= (c["x0"] + c["x1"]) / 2 <= op["x1"] + 6 and abs((c["y0"] + c["y1"]) / 2 - omid) <= 1.6 * op["size"]]
+            above = sorted((c for c in small if (c["y0"] + c["y1"]) / 2 < omid - 0.25 * op["size"]), key=lambda c: c["x0"])
+            below = sorted((c for c in small if (c["y0"] + c["y1"]) / 2 > omid + 0.25 * op["size"]), key=lambda c: c["x0"])
+            for group, off in ((above, -4.5), (below, 4.5)):
+                x = op["x1"] + 0.5
+                for c in group:
+                    w = c["x1"] - c["x0"]
+                    h = c["y1"] - c["y0"]
+                    c["x0"], c["x1"], c["xs"] = x, x + w, x
+                    c["y0"] = base_mid + off - h / 2
+                    c["y1"] = c["y0"] + h
+                    x += w
+    ex = [c for c in chars if ("CMEX" in c.get("font", "") or "MathExt" in c.get("font", "")) and c["c"].strip() in tuple(OPEN_DELIMS + CLOSE_DELIMS)]
+    if not ex:
+        return chars
+    rows = {}
+    for c in ex:
+        rows.setdefault(round(c["y0"], 0), []).append(c)
+    others = [c for c in chars if "CMEX" not in c.get("font", "") and "MathExt" not in c.get("font", "")]
+    for row in rows.values():
+        stack = []
+        for d in sorted(row, key=lambda c: c["x0"]):
+            if d["c"].strip() in OPEN_DELIMS:
+                stack.append(d)
+            elif stack:
+                op = stack.pop()
+                oy0, oy1 = d["y0"], d["y1"]
+                cand = sorted((c for c in others if c["x0"] >= op["x1"] - 1 and c["x1"] <= d["x0"] + 1
+                               and oy0 - 5 <= c["y0"] <= oy1 + 14), key=lambda c: c["y0"])
+                if not cand:
+                    continue
+                # the enclosed text is the first stack of touching rows (a fraction is 2-3 rows); a line below is not part of it
+                inner, reach = [], cand[0]["y1"]
+                for c in cand:
+                    bar = any(r[0] < d["x0"] and r[1] > op["x1"] and reach - 1.5 <= r[2] <= c["y0"] + 1.5 for r in rules)
+                    if c["y0"] <= reach + 1.0 or bar:
+                        inner.append(c)
+                        reach = max(reach, c["y1"])
+                top, bot = min(c["y0"] for c in inner), max(c["y1"] for c in inner)
+                # baseline of this line: body-size letters/digits anywhere in the same band (fraction pieces are a minority)
+                band = [c for c in others if c["size"] >= 0.8 * d["size"] and c["c"].isalnum()
+                        and top - 1 <= (c["y0"] + c["y1"]) / 2 <= bot + 1]
+                mids = sorted((c["y0"] + c["y1"]) / 2 for c in (band or inner))
+                base_mid = mids[len(mids) // 2]
+                for x in (op, d):
+                    x["y0"], x["y1"] = top, bot
+                # exponent right after the closing bracket (it was raised together with the bracket)
+                edge, picked = d["x1"], []
+                for c in sorted(others, key=lambda c: c["x0"]):
+                    if (c["size"] < 0.85 * d["size"] and edge - 1 <= c["x0"] <= edge + 2.5
+                            and oy0 - 6 <= c["y0"] and c["y1"] <= oy1 + 6):
+                        picked.append(c)
+                        edge = c["x1"]
+                for c in picked:
+                    h = c["y1"] - c["y0"]
+                    c["y0"] = base_mid - 4.5 - h / 2
+                    c["y1"] = c["y0"] + h
     return chars
 
 
@@ -123,6 +263,18 @@ def compose_math(chars, rules):
     """Replaces hats, roots and fractions by single pseudo characters carrying their final text."""
     order = max((c["o"] for c in chars), default=0)
 
+    # 0. "not equal": TeX draws it as a zero-width slash (U+0338) in front of "=". Fold the pair into one "≠".
+    for slash in [c for c in chars if c["c"] == "̸"]:
+        eq = next((e for e in chars if e["c"] == "=" and not e["dead"] and abs(e["x0"] - slash["x0"]) <= 2.0
+                   and abs((e["y0"] + e["y1"]) / 2 - (slash["y0"] + slash["y1"]) / 2) <= 6), None)
+        if eq:
+            eq["c"] = "≠"
+            slash["dead"] = True
+
+    for slash in chars:
+        if slash["c"] == "̸":
+            slash["dead"] = True   # a slash that did not meet an '=' is a drawing artefact
+
     # 1. Hats: a zero-width combining mark floating over its letter
     for hat in [c for c in chars if c["c"] in COMBINING]:
         best, best_dx = None, 5.0
@@ -138,30 +290,47 @@ def compose_math(chars, rules):
             best["x1"] = max(best["x1"], hat["x1"])
         hat["dead"] = True
 
-    # 2. Square roots: the √ glyph's right edge touches the left end of a bar drawn over the radicand
+    # 2. Square roots: the √ glyph's right edge touches the left end of a bar drawn over the radicand.
+    #    A root that has a fraction inside it (v = √(3RT/M)) waits until the fraction has been built (step 3).
     root_bars = set()
-    for x0, x1, y in rules:
-        root = next((c for c in chars if not c["dead"] and c["c"] in ROOT_GLYPHS
-                     and abs(c["x1"] - x0) <= 2.5 and c["y0"] - 4.5 <= y <= c["y1"] + 1.5), None)
-        if not root:
-            continue
-        radicand = [c for c in alive(chars) if c is not root and c["c"] not in ROOT_GLYPHS and c["x0"] >= x0 - 0.8 and c["x1"] <= x1 + 0.8
-                    and c["y0"] >= y - 1.5 and c["y0"] <= y + 0.95 * root["size"] and c["y1"] <= y + 1.6 * root["size"]]
-        if not radicand:
-            continue
-        text = render(radicand)
-        tex = ROOT_TEX.get(root["c"], ROOT_TEX["√"]) % render_tex(radicand)
-        root_bars.add((x0, x1, y))
-        for c in radicand:
-            c["dead"] = True
-        root["dead"] = True
-        order += 1
-        chars.append(pseudo(root["c"] + wrap(text), root["x0"], x1, min(c["y0"] for c in radicand), max(c["y1"] for c in radicand),
-                            root["size"], "root", order, tex))
+    deferred_bars = set()
+    waiting = set()   # root glyphs whose own bar is waiting for an inner fraction: no other bar may claim them
+
+    def do_roots(defer):
+        nonlocal order
+        for x0, x1, y in rules:
+            if (x0, x1, y) in root_bars:
+                continue
+            root = next((c for c in chars if not c["dead"] and c["c"] in ROOT_GLYPHS
+                         and abs(c["x1"] - x0) <= 2.5 and c["y0"] - 4.5 <= y <= c["y1"] + 1.5), None)
+            if not root:
+                continue
+            if defer and id(root) in waiting:
+                continue
+            if defer and any((r[0], r[1], r[2]) != (x0, x1, y) and r[0] >= x0 - 0.8 and r[1] <= x1 + 0.8
+                             and y + 1.5 < r[2] <= y + 1.2 * root["size"] for r in rules):
+                waiting.add(id(root))
+                deferred_bars.add((x0, x1, y))
+                continue
+            radicand = [c for c in alive(chars) if c is not root and c["c"] not in ROOT_GLYPHS and c["x0"] >= x0 - 0.8 and c["x1"] <= x1 + 0.8
+                        and c["y0"] >= y - 1.5 and c["y0"] <= y + 0.95 * root["size"] and c["y1"] <= y + 1.6 * root["size"]]
+            if not radicand:
+                continue
+            text = render(radicand)
+            tex = ROOT_TEX.get(root["c"], ROOT_TEX["√"]) % render_tex(radicand)
+            root_bars.add((x0, x1, y))
+            for c in radicand:
+                c["dead"] = True
+            root["dead"] = True
+            order += 1
+            chars.append(pseudo(root["c"] + wrap(text), root["x0"], x1, min(c["y0"] for c in radicand), max(c["y1"] for c in radicand),
+                                root["size"], "root", order, tex))
+
+    do_roots(True)
 
     # 3. Fractions: a bar with a tight stack of characters above and below it
     for x0, x1, y in rules:
-        if x1 - x0 > 160 or (x0, x1, y) in root_bars:
+        if x1 - x0 > 160 or (x0, x1, y) in root_bars or (x0, x1, y) in deferred_bars:
             continue
         pool = alive(chars)
         center = lambda c: (c["x0"] + c["x1"]) / 2
@@ -169,6 +338,19 @@ def compose_math(chars, rules):
         under_bar = [c for c in pool if x0 - 1.5 <= center(c) <= x1 + 1.5]
         over = [c for c in under_bar if c["y1"] <= y + 1.0 and y - c["y1"] <= 4.5]
         under = [c for c in under_bar if c["y0"] >= y - 1.0 and c["y0"] - y <= 4.5]
+        if not over and under and os.environ.get("PDF_OVERLINE") == "1":   # opt-in: Boolean algebra / mean bars / complex conjugates (it also hits some root bars, so it is off by default)
+            # a short bar hugging the top of a few letters and nothing above it: a complement (overline), e.g. NOT A
+            tight = [c for c in under_bar if -1.0 <= c["y0"] - y <= 3.0 and (c["c"].isalpha() or c["c"] in "+·⊕()")]
+            if 1 <= sum(1 for c in tight if c["c"].isalpha()) <= 3 and x1 - x0 <= 45 and len(tight) <= 7 and not any(c["c"].isdigit() for c in under_bar if -1.0 <= c["y0"] - y <= 3.0):
+                size = max(c["size"] for c in tight)
+                plain = render(tight)
+                tex = "\\overline{%s}" % render_tex(tight)
+                for c in tight:
+                    c["dead"] = True
+                order += 1
+                chars.append(pseudo("".join(ch + "\u0305" if ch.isalpha() else ch for ch in plain), x0, x1, min(c["y0"] for c in tight),
+                                    max(c["y1"] for c in tight), size, "over", order, tex))
+            continue
         if not over or not under:
             continue  # not a tight stack: a table line, an underline or the page header rule
         # Numerator and denominator are the ONE text row touching the bar on each side. A row is found from the
@@ -189,6 +371,7 @@ def compose_math(chars, rules):
         order += 1
         chars.append(pseudo(f"{wrap(num)}/{wrap(den)}", x0, x1, y - 0.5 * size, y + 0.5 * size, size, "frac", order, tex))
 
+    do_roots(False)
     return [c for c in chars if not c["dead"]]
 
 
@@ -205,11 +388,12 @@ def baseline(chs, main_size):
 
 def page_lines(page):
     """Group every character of the page into lines (by vertical position), then order each line left to right."""
-    chars = compose_math(collect_chars(page), collect_rules(page))
+    rules = collect_rules(page)
+    chars = compose_math(realign_delimiters(add_inline_images(page, collect_chars(page)), rules), rules)
     sizes = [round(c["size"], 1) for c in chars]
     body = max(set(sizes), key=sizes.count) if sizes else 10.0
-    normal = [c for c in chars if c["size"] >= 0.8 * body]
-    small = [c for c in chars if c["size"] < 0.8 * body]
+    normal = [c for c in chars if c["size"] >= 0.85 * body]
+    small = [c for c in chars if c["size"] < 0.85 * body]
 
     lines = cluster_lines(normal)
     for line in lines:
@@ -225,7 +409,7 @@ def page_lines(page):
         # (an option label "(b)" with its fraction beside it), not only when its middle falls inside the line.
         anchor = ch["x0"] if ch["math"] in ("frac", "root") else cx
         fits = [l for l in lines if l["x_lo"] <= anchor <= l["x_hi"] and abs(mid - l["mid"]) <= 0.6 * l["size"]
-                and 0.55 * l["size"] <= ch["size"] < 0.8 * l["size"]]
+                and 0.55 * l["size"] <= ch["size"] < 0.85 * l["size"]]
         if fits:
             line = min(fits, key=lambda l: abs(mid - l["mid"]))
             line["chars"].append(ch)
@@ -311,7 +495,7 @@ def build_text(chs, main_size, base, tex=False):
     prev = None
     run = None  # (kind, text) while inside a super/subscript run
     for i, ch in enumerate(chs):
-        small = ch["size"] < 0.8 * main_size
+        small = ch["size"] < 0.85 * main_size
         mid = (ch["y0"] + ch["y1"]) / 2
         kind = None
         if small and ch["c"].strip():
@@ -330,7 +514,7 @@ def build_text(chs, main_size, base, tex=False):
         if kind:
             run = run or (kind, "")
             run = (kind, run[1] + ch["c"])
-        elif ch["math"] in ("frac", "root") and ch.get("tex"):
+        elif ch["math"] in ("frac", "root", "over") and ch.get("tex"):
             parts.append(ch["tex"] if tex else MATH_OPEN + ch["tex"] + MATH_SEP + ch["c"] + MATH_CLOSE)
         elif tex:
             parts.append(TEX_ESCAPES.get(ch["c"], ch["c"]))
