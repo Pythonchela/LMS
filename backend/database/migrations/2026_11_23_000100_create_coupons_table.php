@@ -8,6 +8,12 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // An older, different `coupons` table (from an earlier line of this project) may already exist. It is kept under
+        // another name instead of being dropped, so nothing is lost.
+        if (Schema::hasTable('coupons') && ! Schema::hasColumn('coupons', 'min_order')) {
+            Schema::rename('coupons', 'coupons_legacy');
+        }
+
         // Discount codes a student types at checkout. `value` is a percentage (type "percent") or an amount in rupees
         // (type "fixed"). A coupon can be limited to one batch, to a minimum order, to a number of uses and to a date range.
         Schema::create('coupons', function (Blueprint $table) {
