@@ -3,10 +3,13 @@
 use App\Http\Controllers\Api\V1\AttemptController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BatchController;
+use App\Http\Controllers\Api\V1\BlogController;
 use App\Http\Controllers\Api\V1\ContentController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\CustomPageController;
+use App\Http\Controllers\Api\V1\CheckoutController;
 use App\Http\Controllers\Api\V1\NoteController;
+use App\Http\Controllers\Api\V1\PaymentController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PdfPageController;
 use App\Http\Controllers\Api\V1\PerformanceController;
@@ -30,6 +33,14 @@ Route::prefix('v1')->group(function () {
     Route::get('batches/config', [BatchController::class, 'config']);
     Route::get('batches', [BatchController::class, 'index']);
     Route::get('batches/{slug}', [BatchController::class, 'show']);
+
+    // ---- Public blog and the list of addresses for the sitemap ----
+    Route::middleware('throttle:120,1')->group(function () {
+        Route::get('blog', [BlogController::class, 'index']);
+        Route::get('blog/categories', [BlogController::class, 'categories']);
+        Route::get('blog/posts/{slug}', [BlogController::class, 'show']);
+        Route::get('sitemap-data', [BlogController::class, 'sitemap']);
+    });
 
     // ---- In-Built Custom Pages & Builder ----
     Route::get('custom-pages', [CustomPageController::class, 'index']);
@@ -55,6 +66,9 @@ Route::prefix('v1')->group(function () {
         Route::post('check', [WordPressController::class, 'check']);
     });
 
+    // ---- Razorpay webhook (public; the signature header is what makes it trusted) ----
+    Route::post('payments/webhook/razorpay', [PaymentController::class, 'webhook'])->middleware('throttle:120,1');
+
     // ---- Protected PDF page images: signed, expiring link (an <img> tag can't send the login token) ----
     Route::get('pdf-pages/{content}/{page}', [PdfPageController::class, 'show'])
         ->whereNumber(['content', 'page'])->middleware('signed')->name('pdf.page');
@@ -68,6 +82,13 @@ Route::prefix('v1')->group(function () {
         Route::put('me', [ProfileController::class, 'update']);
         Route::get('me/devices', [ProfileController::class, 'devices']);
         Route::delete('me/devices/{id}', [ProfileController::class, 'destroyDevice'])->whereNumber('id');
+
+        // Buying a batch, and the student's payments / receipts
+        Route::post('checkout/quote', [CheckoutController::class, 'quote'])->middleware('throttle:60,1');
+        Route::post('checkout/order', [CheckoutController::class, 'order'])->middleware('throttle:20,1');
+        Route::post('checkout/verify', [CheckoutController::class, 'verify'])->middleware('throttle:30,1');
+        Route::get('payments', [PaymentController::class, 'index']);
+        Route::get('payments/{id}/receipt', [PaymentController::class, 'receipt'])->whereNumber('id');
 
         // Learning: courses → subjects → content
         Route::get('courses', [CourseController::class, 'index']);

@@ -128,6 +128,8 @@ class AdminResource extends Resource
                             'manage_page_builder' => 'Page Builder (Design & publish custom student pages)',
                             'manage_students' => 'Students & Enrollments (Inspect students, manual enrollment)',
                             'manage_reports' => 'Question Reports (Review and fix reported questions)',
+                            'manage_payments' => 'Payments & Coupons (See payments, record refunds, create discount codes)',
+                            'manage_blog' => 'Blog (Write, schedule and publish blog posts)',
                             'manage_support_chat' => 'Support Chat & WhatsApp Queries (Direct student reply & issue management)',
                             'can_publish_without_approval' => 'Direct Publish / Auto-Live (Changes publish immediately without Super Admin approval)',
                             'receive_change_emails' => 'Receive Change Notification Emails',

@@ -41,6 +41,27 @@ return [
         'sso_minutes' => 5,   // how long a "go to my course" sign-in link works (and only once)
     ],
 
+    // Payments (Razorpay, checkout inside the student site). The keys live in .env only. Empty keys = paid checkout is
+    // switched off and the batch store falls back to the old purchase link. Use Razorpay TEST keys until you go live.
+    'billing' => [
+        'razorpay_key_id' => env('RAZORPAY_KEY_ID'),
+        'razorpay_key_secret' => env('RAZORPAY_KEY_SECRET'),
+        'razorpay_webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),
+        'razorpay_api' => env('RAZORPAY_API', 'https://api.razorpay.com/v1'),
+        'currency' => 'INR',
+        // Prices include GST. When this is above 0 the receipt shows how much of the total is tax.
+        'gst_percent' => (float) env('LMS_GST_PERCENT', 0),
+        'receipt_prefix' => env('LMS_RECEIPT_PREFIX', 'MMN'),
+        // Printed at the top of every receipt.
+        'business' => [
+            'name' => env('LMS_BUSINESS_NAME', 'My Merchant Navy'),
+            'address' => env('LMS_BUSINESS_ADDRESS', ''),
+            'gstin' => env('LMS_BUSINESS_GSTIN', ''),
+            'email' => env('LMS_BUSINESS_EMAIL', 'support@mymerchantnavy.com'),
+            'website' => env('LMS_BUSINESS_WEBSITE', 'https://mymerchantnavy.com'),
+        ],
+    ],
+
     // Assignment upload limit (KB).
     'assignment_max_kb' => 20480,
 ];

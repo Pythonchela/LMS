@@ -32,7 +32,7 @@
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
         }
         .mmn-stat-card.is-active {
-            border: 2px solid #2563eb;
+            border: 2px solid #0f766e;
             box-shadow: 0 0 0 3px rgba(37,99,235,0.18);
         }
         .mmn-stat-header {
@@ -56,7 +56,7 @@
             font-weight: 700;
             padding: 2px 8px;
             border-radius: 9999px;
-            background: #2563eb;
+            background: #0f766e;
             color: #ffffff;
         }
         .mmn-stat-value {
@@ -160,13 +160,13 @@
             border-radius: 9999px;
             font-size: 11px;
             font-weight: 700;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
+            background: #f0fdfa;
+            color: #115e59;
+            border: 1px solid #99f6e4;
         }
         .dark .mmn-filter-badge {
             background: rgba(30, 58, 138, 0.3);
-            color: #93c5fd;
+            color: #5eead4;
             border-color: #1e40af;
         }
         .mmn-clear-btn {

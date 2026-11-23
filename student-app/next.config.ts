@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { PRIVATE_PATHS } from "./src/lib/seo";
 
 /**
  * The admin panel is part of the backend, not of this student website. Anyone who types <student site>/admin is sent to
@@ -10,6 +11,13 @@ const backendOrigin = (process.env.NEXT_PUBLIC_API_URL ?? "").replace(/\/api\/v1
 const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
+  },
+  // Search engines must not list the student's own pages (the sitemap and robots.txt already leave them out).
+  async headers() {
+    return PRIVATE_PATHS.map((path) => ({
+      source: `${path}/:path*`,
+      headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+    })).concat(PRIVATE_PATHS.map((path) => ({ source: path, headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] })));
   },
   async redirects() {
     return [

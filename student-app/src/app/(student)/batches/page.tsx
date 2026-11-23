@@ -219,15 +219,13 @@ function BatchCard({ batch }: { batch: BatchItem }) {
                 <ArrowRight className="size-3.5" />
               </Link>
             ) : (
-              <a
-                href={batch.purchaseUrl || "https://mymerchantnavy.com/pass/"}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 text-xs font-bold shadow-xs transition whitespace-nowrap active:scale-95"
+              <Link
+                href={`/store/${batch.slug}`}
+                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-accent-500 hover:bg-accent-400 text-navy-900 px-4 py-2 text-xs font-bold shadow-xs transition whitespace-nowrap active:scale-95"
               >
                 <span>Buy Now</span>
                 <ArrowRight className="size-3.5" />
-              </a>
+              </Link>
             )}
           </div>
         </div>

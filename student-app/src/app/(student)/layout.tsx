@@ -27,14 +27,18 @@ export default function StudentLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className="min-h-dvh">
-      <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} collapsed={collapsed} onToggleCollapsed={() => setCollapsed((c) => !c)} />
-      <div className={cn("transition-all duration-200", collapsed ? "lg:pl-[4.5rem]" : "lg:pl-64")}>
+      <div className="print:hidden">
+        <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} collapsed={collapsed} onToggleCollapsed={() => setCollapsed((c) => !c)} />
+      </div>
+      <div className={cn("transition-all duration-200 print:pl-0", collapsed ? "lg:pl-[4.5rem]" : "lg:pl-64")}>
         <Topbar onMenu={() => setMenuOpen(true)} />
         <main className={cn("mx-auto px-4 py-6 sm:px-6 lg:py-8", inLesson ? "max-w-none" : "max-w-6xl")}>
           <PageVisibilityGuard>{children}</PageVisibilityGuard>
         </main>
       </div>
-      <SupportChatbot />
+      <div className="print:hidden">
+        <SupportChatbot />
+      </div>
     </div>
   );
 }

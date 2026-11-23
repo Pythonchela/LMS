@@ -108,7 +108,7 @@
                                 </div>
                                 <div style="border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
                                     @foreach($options as $opt)
-                                    <div style="padding:12px 16px;border-bottom:1px solid #f1f5f9;background:{{ !empty($opt['is_correct']) ? '#f0fdf4' : (!empty($opt['was_student_pick']) ? '#eff6ff' : '#ffffff') }};display:flex;align-items:center;justify-content:space-between">
+                                    <div style="padding:12px 16px;border-bottom:1px solid #f1f5f9;background:{{ !empty($opt['is_correct']) ? '#f0fdf4' : (!empty($opt['was_student_pick']) ? '#f0fdfa' : '#ffffff') }};display:flex;align-items:center;justify-content:space-between">
                                         <div style="font-size:13px;color:#1e293b;line-height:1.4">
                                             <strong style="margin-right:6px">({{ $opt['letter'] }})</strong> {{ $opt['body'] }}
                                         </div>
@@ -119,7 +119,7 @@
                                                 </span>
                                             @endif
                                             @if(!empty($opt['was_student_pick']))
-                                                <span style="background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;margin-left:4px">
+                                                <span style="background:#ccfbf1;color:#115e59;border:1px solid #99f6e4;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;text-transform:uppercase;margin-left:4px">
                                                     👤 Student Picked
                                                 </span>
                                             @endif

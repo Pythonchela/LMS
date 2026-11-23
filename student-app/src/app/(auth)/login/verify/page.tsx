@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import * as api from "@/lib/api";
 import { LOGIN_METHOD, OTP_RESEND_SECONDS } from "@/lib/config";
-import { loginIdentity } from "@/lib/login-session";
+import { loginIdentity, takeNext } from "@/lib/login-session";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 
@@ -59,7 +59,7 @@ export default function VerifyOtpPage() {
     try {
       const { needsProfile } = await api.auth.verifyOtp(identity, code);
       loginIdentity.clear();
-      router.replace(needsProfile ? "/onboarding" : "/my-courses");
+      router.replace(needsProfile ? "/onboarding" : takeNext());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid code");
       setLoading(false);

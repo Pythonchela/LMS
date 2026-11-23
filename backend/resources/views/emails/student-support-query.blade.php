@@ -12,7 +12,7 @@
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05),0 2px 4px -2px rgba(0,0,0,0.05);border:1px solid #e2e8f0">
                     <!-- Brand Navy Header -->
                     <tr>
-                        <td style="background:#0f172a;padding:28px 32px;border-bottom:3px solid #2563eb">
+                        <td style="background:#0f172a;padding:28px 32px;border-bottom:3px solid #0f766e">
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                                 <tr>
                                     <td>
@@ -24,7 +24,7 @@
                                         </div>
                                     </td>
                                     <td align="right">
-                                        <span style="display:inline-block;background:rgba(37,99,235,0.2);border:1px solid #3b82f6;color:#93c5fd;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px">
+                                        <span style="display:inline-block;background:rgba(15,118,110,0.2);border:1px solid #0d9488;color:#5eead4;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px">
                                             {{ $category }}
                                         </span>
                                     </td>
@@ -57,8 +57,8 @@
                                     <td style="padding:14px 20px;border-bottom:1px solid #e2e8f0;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px">
                                         Email Address
                                     </td>
-                                    <td style="padding:14px 20px;border-bottom:1px solid #e2e8f0;font-size:14px;font-weight:600;color:#2563eb">
-                                        <a href="mailto:{{ $email }}" style="color:#2563eb;text-decoration:none">{{ $email }}</a>
+                                    <td style="padding:14px 20px;border-bottom:1px solid #e2e8f0;font-size:14px;font-weight:600;color:#0f766e">
+                                        <a href="mailto:{{ $email }}" style="color:#0f766e;text-decoration:none">{{ $email }}</a>
                                     </td>
                                 </tr>
                                 <tr>
@@ -91,7 +91,7 @@
                             <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px">
                                 <tr>
                                     <td align="center" style="padding-right:8px;width:50%">
-                                        <a href="mailto:{{ $email }}?subject=Re:%20[MMN%20Support]%20{{ rawurlencode($category) }}" style="display:block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:12px 18px;border-radius:10px;text-align:center">
+                                        <a href="mailto:{{ $email }}?subject=Re:%20[MMN%20Support]%20{{ rawurlencode($category) }}" style="display:block;background:#0f766e;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:12px 18px;border-radius:10px;text-align:center">
                                             ✉️ Reply to Student
                                         </a>
                                     </td>

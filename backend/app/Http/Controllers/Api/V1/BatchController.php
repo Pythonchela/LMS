@@ -103,6 +103,8 @@ class BatchController extends Controller
             'isLive' => $batch->is_live,
             'status' => $batch->status,
             'isEnrolled' => $isEnrolled,
+            // True when the student can buy this batch here (Razorpay is set up, or it is free) and it has courses to give.
+            'canBuyOnline' => ($batch->price <= 0 || app(\App\Services\Billing\RazorpayClient::class)->enabled()) && $batch->courses->isNotEmpty() && ($batch->status ?? 'active') === 'active',
             'courses' => $batch->courses->map(fn ($c) => [
                 'id' => $c->id,
                 'title' => $c->title,

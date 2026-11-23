@@ -12,12 +12,12 @@
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:460px;background:#ffffff;border-radius:16px;border:1px solid #e5e9f0">
                     <tr>
                         <td style="padding:28px 28px 8px">
-                            <div style="font-size:18px;font-weight:700;color:#0b1e3d">My Merchant <span style="color:#2563eb">Navy</span></div>
+                            <div style="font-size:18px;font-weight:700;color:#0a2a2e">My Merchant <span style="color:#0f766e">Navy</span></div>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding:8px 28px 0">
-                            <p style="margin:0 0 6px;font-size:20px;font-weight:700;color:#0b1e3d">Your login code</p>
+                            <p style="margin:0 0 6px;font-size:20px;font-weight:700;color:#0a2a2e">Your login code</p>
                             <p style="margin:0;font-size:15px;line-height:1.6;color:#475569">
                                 Use this code to log in. It is valid for {{ $minutes }} minutes.
                             </p>
@@ -25,7 +25,7 @@
                     </tr>
                     <tr>
                         <td align="center" style="padding:22px 28px">
-                            <div style="display:inline-block;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 28px;font-size:32px;letter-spacing:8px;font-weight:700;color:#1d4ed8">{{ $code }}</div>
+                            <div style="display:inline-block;background:#f0fdfa;border:1px solid #99f6e4;border-radius:12px;padding:14px 28px;font-size:32px;letter-spacing:8px;font-weight:700;color:#115e59">{{ $code }}</div>
                         </td>
                     </tr>
                     <tr>

@@ -50,7 +50,7 @@
         .mmn-val-sub {
             font-size: 12px;
             font-weight: 600;
-            color: #2563eb;
+            color: #0f766e;
         }
         .dark .mmn-val-sub {
             color: #60a5fa;

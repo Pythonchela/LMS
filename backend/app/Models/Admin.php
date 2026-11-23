@@ -80,7 +80,7 @@ class Admin extends Authenticatable implements FilamentUser
 
         // Default role fallbacks if permissions array is null:
         return match ($this->role) {
-            AdminRole::Admin => in_array($permission, ['manage_courses', 'manage_tests', 'manage_batches', 'manage_page_builder', 'manage_students', 'manage_reports', 'can_publish_without_approval'], true),
+            AdminRole::Admin => in_array($permission, ['manage_courses', 'manage_tests', 'manage_batches', 'manage_page_builder', 'manage_students', 'manage_reports', 'manage_blog', 'can_publish_without_approval'], true),
             AdminRole::Manager, AdminRole::SiteManager => in_array($permission, ['manage_support_chat', 'manage_reports', 'manage_students'], true),
             AdminRole::Support => in_array($permission, ['manage_support_chat', 'manage_reports'], true),
             default => false,

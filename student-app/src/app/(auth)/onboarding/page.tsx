@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { UserRound } from "lucide-react";
 import * as api from "@/lib/api";
 import { useApi } from "@/lib/use-api";
+import { takeNext } from "@/lib/login-session";
 import { ProfileForm } from "@/components/profile/ProfileForm";
 import { Skeleton } from "@/components/ui/States";
 
@@ -28,7 +29,7 @@ export default function OnboardingPage() {
           submitLabel="Save & go to dashboard"
           onSubmit={async (values) => {
             await api.profile.updateMe(values);
-            router.replace("/my-courses");
+            router.replace(takeNext());
           }}
         />
       )}

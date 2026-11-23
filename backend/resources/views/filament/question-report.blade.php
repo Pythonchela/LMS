@@ -89,7 +89,7 @@
                             @endif
 
                             @if ($isStudentPick)
-                                <span style="display:inline-flex;align-items:center;gap:0.25rem;padding:0.25rem 0.625rem;border-radius:9999px;font-size:0.6875rem;font-weight:700;background:{{ $isKey ? '#dbeafe' : '#fee2e2' }};color:{{ $isKey ? '#1e40af' : '#991b1b' }};border:1px solid {{ $isKey ? '#bfdbfe' : '#fecaca' }};">
+                                <span style="display:inline-flex;align-items:center;gap:0.25rem;padding:0.25rem 0.625rem;border-radius:9999px;font-size:0.6875rem;font-weight:700;background:{{ $isKey ? '#ccfbf1' : '#fee2e2' }};color:{{ $isKey ? '#1e40af' : '#991b1b' }};border:1px solid {{ $isKey ? '#99f6e4' : '#fecaca' }};">
                                     👤 STUDENT PICK
                                 </span>
                             @endif

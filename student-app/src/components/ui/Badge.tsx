@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type Tone = "blue" | "green" | "red" | "amber" | "purple" | "slate" | "navy";
+type Tone = "blue" | "green" | "red" | "amber" | "purple" | "slate" | "navy" | "orange";
 
 const tones: Record<Tone, string> = {
   blue: "bg-brand-50 text-brand-700 ring-brand-100",
@@ -10,6 +10,7 @@ const tones: Record<Tone, string> = {
   purple: "bg-violet-50 text-violet-700 ring-violet-100",
   slate: "bg-slate-100 text-slate-600 ring-slate-200",
   navy: "bg-navy-900 text-white ring-navy-900",
+  orange: "bg-accent-50 text-accent-700 ring-accent-200",
 };
 
 export function Badge({ tone = "slate", className, children }: { tone?: Tone; className?: string; children: React.ReactNode }) {

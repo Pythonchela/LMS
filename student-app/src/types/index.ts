@@ -48,6 +48,8 @@ export interface BatchItem {
   isLive: boolean;
   status: "active" | "upcoming" | "closed";
   isEnrolled: boolean;
+  /** True when the student can pay for this batch on this site (Razorpay is set up, or it is free). */
+  canBuyOnline?: boolean;
   courses: { id: number; title: string; slug: string }[];
   tests: { id: number; title: string; durationMinutes: number }[];
 }
@@ -238,7 +240,7 @@ export interface AttemptResult extends AttemptSummary {
 
 // ---------- Notifications ----------
 
-export type NotificationType = "course_assigned" | "live_class" | "result" | "announcement" | "report";
+export type NotificationType = "course_assigned" | "live_class" | "result" | "announcement" | "report" | "payment";
 
 export interface AppNotification {
   id: string;
@@ -328,4 +330,95 @@ export interface NoteWithContext extends StudentNote {
   subjectTitle: string;
   courseId: number;
   courseTitle: string;
+}
+
+// ---------- Payments ----------
+
+export interface Quote {
+  original: number;
+  discount: number;
+  total: number;
+  free: boolean;
+  couponCode: string | null;
+  currency: string;
+}
+
+export interface StartedOrder {
+  free: boolean;
+  paymentId: number;
+  orderId: string | null;
+  /** In paise (what Razorpay wants). */
+  amount: number;
+  currency: string;
+  keyId: string | null;
+  name: string;
+  description: string;
+}
+
+export interface VerifiedPayment {
+  paymentId: number;
+  receiptNo: string | null;
+  status: string;
+}
+
+export interface Payment {
+  id: number;
+  receiptNo: string | null;
+  item: string;
+  total: number;
+  discount: number;
+  couponCode: string | null;
+  status: "paid" | "refunded";
+  paidAt: string | null;
+}
+
+export interface PaymentReceipt {
+  id: number;
+  receiptNo: string | null;
+  status: string;
+  paidAt: string | null;
+  item: string;
+  customer: { name: string | null; email: string | null };
+  currency: string;
+  original: number;
+  discount: number;
+  couponCode: string | null;
+  total: number;
+  tax: { ratePercent: number; taxable: number; amount: number } | null;
+  method: string | null;
+  razorpayPaymentId: string | null;
+  orderId: string | null;
+  business: { name: string; address: string; gstin: string; email: string; website: string };
+}
+
+// ---------- Blog ----------
+
+export interface BlogCard {
+  id: number;
+  title: string;
+  slug: string;
+  excerpt: string;
+  coverUrl: string | null;
+  coverAlt: string;
+  author: string | null;
+  publishedAt: string | null;
+  readingMinutes: number;
+  category: { name: string; slug: string } | null;
+}
+
+export interface BlogPost extends BlogCard {
+  body: string;
+  seoTitle: string;
+  seoDescription: string;
+  canonicalUrl: string | null;
+  noindex: boolean;
+  updatedAt: string | null;
+  related: BlogCard[];
+}
+
+export interface BlogCategory {
+  name: string;
+  slug: string;
+  description: string | null;
+  count: number;
 }

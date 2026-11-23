@@ -1,4 +1,4 @@
-import { BookOpen, Flag, Megaphone, Radio, Trophy } from "lucide-react";
+import { BookOpen, Flag, Megaphone, Radio, Receipt, Trophy } from "lucide-react";
 import type { NotificationType } from "@/types";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,7 @@ const styles: Record<NotificationType, { icon: React.ElementType; className: str
   result: { icon: Trophy, className: "bg-amber-50 text-amber-600" },
   announcement: { icon: Megaphone, className: "bg-violet-50 text-violet-600" },
   report: { icon: Flag, className: "bg-green-50 text-green-600" },
+  payment: { icon: Receipt, className: "bg-accent-50 text-accent-700" },
 };
 
 export function NotificationIcon({ type, className }: { type: NotificationType; className?: string }) {

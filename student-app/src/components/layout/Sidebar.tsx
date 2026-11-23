@@ -140,7 +140,7 @@ export function Sidebar({
                   active ? "bg-white/10 text-white" : "hover:bg-white/5 hover:text-white",
                 )}
               >
-                {active && <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-brand-500" />}
+                {active && <span className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-accent-500" />}
                 <Icon className={cn("size-5 shrink-0", active ? "text-brand-200" : "text-slate-400 group-hover:text-slate-200")} />
                 <span className={label}>{text}</span>
               </Link>

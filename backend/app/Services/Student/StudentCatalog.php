@@ -30,8 +30,8 @@ class StudentCatalog
     /** Banner gradients for course cards (until courses get uploaded thumbnails). */
     private const ACCENTS = [
         'from-navy-900 via-navy-800 to-brand-600',
-        'from-brand-700 via-brand-600 to-sky-500',
-        'from-navy-800 via-brand-700 to-sky-500',
+        'from-brand-700 via-brand-600 to-brand-400',
+        'from-navy-800 via-brand-700 to-accent-500',
         'from-slate-800 via-navy-700 to-brand-500',
     ];
 

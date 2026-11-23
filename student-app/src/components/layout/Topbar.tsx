@@ -10,7 +10,7 @@ export function Topbar({ onMenu }: { onMenu: () => void }) {
   const { data: me } = useApi(() => api.profile.getMe(), []);
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line bg-white/90 px-4 backdrop-blur transition-colors dark:border-slate-800 dark:bg-slate-900/90 sm:px-6">
+    <header className="sticky top-0 z-20 print:hidden flex h-16 items-center gap-3 border-b border-line bg-white/90 px-4 backdrop-blur transition-colors dark:border-slate-800 dark:bg-slate-900/90 sm:px-6">
       <button
         onClick={onMenu}
         className="grid size-10 place-items-center rounded-xl text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 lg:hidden"

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { LoaderCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "outline" | "ghost" | "danger" | "navy";
+type Variant = "primary" | "outline" | "ghost" | "danger" | "navy" | "accent";
 type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
@@ -11,6 +11,8 @@ const variants: Record<Variant, string> = {
   outline: "border border-line bg-white text-navy-900 hover:border-brand-200 hover:bg-brand-50",
   ghost: "text-slate-600 hover:bg-slate-100 hover:text-navy-900",
   danger: "bg-red-600 text-white hover:bg-red-700",
+  /** Orange call to action (Buy, Enrol now). Dark text on bright orange keeps the contrast high. */
+  accent: "bg-accent-500 text-navy-900 hover:bg-accent-400 shadow-sm shadow-accent-500/20",
 };
 
 const sizes: Record<Size, string> = {

@@ -12,7 +12,7 @@
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);border:1px solid #e2e8f0">
                     <!-- Header -->
                     <tr>
-                        <td style="background:#0f172a;padding:24px 32px;border-bottom:3px solid #2563eb">
+                        <td style="background:#0f172a;padding:24px 32px;border-bottom:3px solid #0f766e">
                             <div style="font-size:20px;font-weight:800;letter-spacing:-0.5px;color:#ffffff">
                                 MY MERCHANT <span style="color:#38bdf8">NAVY</span>
                             </div>
@@ -37,7 +37,7 @@
                                 <div style="font-size:12px;font-weight:700;color:#0f172a;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">
                                     Response from {{ $facultyName }}:
                                 </div>
-                                <div style="background:#eff6ff;border:1px solid #bfdbfe;border-left:4px solid #2563eb;border-radius:8px;padding:16px 20px;font-size:14px;line-height:1.6;color:#1e3a8a;white-space:pre-wrap">{{ $replyMessage }}</div>
+                                <div style="background:#f0fdfa;border:1px solid #99f6e4;border-left:4px solid #0f766e;border-radius:8px;padding:16px 20px;font-size:14px;line-height:1.6;color:#1e3a8a;white-space:pre-wrap">{{ $replyMessage }}</div>
                             </div>
 
                             <!-- Original Doubt Box -->
@@ -53,7 +53,7 @@
                             </p>
 
                             <div style="text-align:center">
-                                <a href="https://lms.mymerchantnavy.com" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:12px 24px;border-radius:10px">
+                                <a href="https://lms.mymerchantnavy.com" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;font-size:13px;font-weight:700;padding:12px 24px;border-radius:10px">
                                     Open Student LMS &rarr;
                                 </a>
                             </div>

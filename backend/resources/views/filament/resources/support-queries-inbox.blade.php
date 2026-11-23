@@ -710,7 +710,7 @@
             color: #f8fafc;
         }
         .mmn-form-input:focus {
-            border-color: #2563eb;
+            border-color: #0f766e;
         }
         .mmn-textarea {
             flex: 1;
@@ -814,7 +814,7 @@
                         <button
                             type="button"
                             wire:click="newEmailCompose"
-                            style="font-size: 11px; background: #2563eb; color: #fff; padding: 4px 8px; border-radius: 6px; border: none; cursor: pointer; font-weight: 700;"
+                            style="font-size: 11px; background: #0f766e; color: #fff; padding: 4px 8px; border-radius: 6px; border: none; cursor: pointer; font-weight: 700;"
                             title="Compose email to any student address"
                         >
                             + New Mail
@@ -1121,7 +1121,7 @@
                         <h3 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">Compose Student Email</h3>
                         <span style="font-size: 12px; color: #64748b;">
                             @if (filled($recipientEmail))
-                                Sending to: <strong style="color: #2563eb;">{{ $recipientEmail }}</strong>
+                                Sending to: <strong style="color: #0f766e;">{{ $recipientEmail }}</strong>
                             @else
                                 Enter any student email address below or select an inquiry from the left.
                             @endif
@@ -1243,7 +1243,7 @@
                     <button
                         type="button"
                         wire:click="sendPlatformEmail"
-                        style="background: #2563eb; color: #ffffff; border: none; padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(37,99,235,0.3);"
+                        style="background: #0f766e; color: #ffffff; border: none; padding: 10px 22px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 1px 3px rgba(37,99,235,0.3);"
                     >
                         <span>Send Email via Brevo to Student</span>
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">

@@ -54,6 +54,10 @@ class AppServiceProvider extends ServiceProvider
             'assignment' => Models\Assignment::class,
             'setting' => Models\Setting::class,
             'activity_log' => Models\ActivityLog::class,
+            'payment' => Models\Payment::class,
+            'coupon' => Models\Coupon::class,
+            'blog_post' => Models\BlogPost::class,
+            'blog_category' => Models\BlogCategory::class,
         ]);
 
         // Audit observers for tracking changes made by admins
