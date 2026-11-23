@@ -39,3 +39,8 @@ Refunds: send the money back from the Razorpay dashboard. The webhook marks the 
 
 ## Theme
 Teal and orange. Colours live in `student-app/src/app/globals.css` (`brand-*` teal, `accent-*` orange, `navy-*` deep teal) and the admin panel colours in `AdminPanelProvider`.
+
+## Where the code lives now (23 Nov 2026)
+- The live server (`~/lms` on Hostinger) pulls from **https://github.com/Pythonchela/LMS** (branch `main`). It is no longer connected to Hannisiddiqui's repository or account, and the old remote was removed from the local clone.
+- Update flow: commit locally, `git push pythonchela main`, then on the server `cd ~/lms && git pull`, `composer install --no-dev --optimize-autoloader`, `php artisan migrate --force`, `rm -rf bootstrap/cache/filament`, `php artisan config:cache && php artisan route:cache && php artisan view:cache`.
+- Backup of the previous server state (made before the switch), kept on the server in `~/backups/`: `lms-code-20261123-1356.tgz`, `db-20261123-1356.sql.gz`, `hanni-uncommitted-20261123-1356.patch` and its file list. The old `coupons` table (empty) is kept as `coupons_legacy`.
